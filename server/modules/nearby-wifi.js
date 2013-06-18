@@ -27,8 +27,11 @@ exports.getAllWifiHotSpots = function(req, res){
 	if (typeof req.query.limit !== 'undefined' && req.query.limit !== null){
    		l_val = parseInt(req.query.limit)
 	}
+
+	var lng = parseFloat(req.query.lng)
+	var lat = parseFloat(req.query.lat)
 	
-	var query = WifiHotSpotModel.find({}).select('name').limit(l_val);
+	var query = WifiHotSpotModel.find({}).select('name loc').where('loc').near(lng,lat).limit(l_val);
 
 	query.exec(function (err, wifiHotspots) {
  		if (!err) {
@@ -41,7 +44,7 @@ exports.getAllWifiHotSpots = function(req, res){
 
 exports.getWifiHotSpot = function(req, res){
 
-	WifiHotSpotModel.findOne({'_id' : req.params.id},'name', function (err, wifiHotspot) {
+	WifiHotSpotModel.findOne({'_id' : req.params.id},'name loc', function (err, wifiHotspot) {
  		if (!err) {
       		return res.send(wifiHotspot);
 	    } else {
