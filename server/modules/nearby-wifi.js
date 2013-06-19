@@ -23,16 +23,41 @@ var WifiHotSpotModel = mongoose.model('WifiHotSpot', WifiHotSpot)
 exports.getAllWifiHotSpots = function(req, res){
 
 	var l_val = 10;
+	var lat;
+	var lng;
 
-	if (typeof req.query.limit !== 'undefined' && req.query.limit !== null){
+	if (typeof req.query.limit !== 'undefined' 
+		&& req.query.limit !== null){
    		l_val = parseInt(req.query.limit)
 	}
 
-	var lng = parseFloat(req.query.lng)
-	var lat = parseFloat(req.query.lat)
-	
-	var query = WifiHotSpotModel.find({}).select('name loc').where('loc').near(lng,lat).limit(l_val);
+	if (typeof req.query.lng !== 'undefined' 
+		&& req.query.lng !== null 
+		&& !isNaN(req.query.lng)
+		&& req.query.lng >= -180
+		&& req.query.lng < 180){
+		lng = parseFloat(req.query.lng)
+	}
 
+	if (typeof req.query.lat !== 'undefined' 
+		&& req.query.lat !== null 
+		&& !isNaN(req.query.lat)
+		&& req.query.lat >= -180
+		&& req.query.lat < 180){
+		lat = parseFloat(req.query.lat)
+	}
+	
+	var query = WifiHotSpotModel.find({}).select('name loc');
+
+	//add the geospatial query criteria if lat and lng are available
+	if(typeof lng !== 'undefined' && typeof lat !== 'undefined'){
+		console.log('lng: ' + lng + ', lat: ' + lat);
+		query.where('loc').near(lng,lat);
+	}
+	//set the result limit
+	console.log('limit: ' + l_val);
+	query.limit(l_val);
+	
 	query.exec(function (err, wifiHotspots) {
  		if (!err) {
       		return res.send(wifiHotspots);
@@ -44,7 +69,12 @@ exports.getAllWifiHotSpots = function(req, res){
 
 exports.getWifiHotSpot = function(req, res){
 
-	WifiHotSpotModel.findOne({'_id' : req.params.id},'name loc', function (err, wifiHotspot) {
+	var id;
+	if(typeof req.params.id !== 'undefined' && req.params.id){
+		id = req.params.id
+	}
+	console.log('id: ' + id);
+	WifiHotSpotModel.findOne({'_id' : id},'name loc', function (err, wifiHotspot) {
  		if (!err) {
       		return res.send(wifiHotspot);
 	    } else {
