@@ -47,12 +47,12 @@ exports.getAllWifiHotSpots = function(req, res){
 		&& req.query.lat < 180){
 		lat = parseFloat(req.query.lat)
 	}
-	
+	console.log('Finding WifiHotpSpots');
 	var query = WifiHotSpotModel.find({}).select('name loc');
 
 	//add the geospatial query criteria if lat and lng are available
 	if(typeof lng !== 'undefined' && typeof lat !== 'undefined'){
-		console.log('lng: ' + lng + ', lat: ' + lat);
+		console.log('Around, lng: ' + lng + ', lat: ' + lat);
 		query.where('loc').near(lng,lat);
 	}
 	//set the result limit
@@ -60,11 +60,13 @@ exports.getAllWifiHotSpots = function(req, res){
 	query.limit(l_val);
 	
 	query.exec(function (err, wifiHotspots) {
- 		if (!err) {
-      		return res.send(wifiHotspots);
-	    } else {
-	    	return console.log(err);
-	    }
+
+ 		res.setHeader('Content-Type', 'application/json');
+ 		if (err) {
+			console.log(err);
+			res.send(500);
+	    } 
+	    return res.send(wifiHotspots);
 	});
 };
 
@@ -74,12 +76,17 @@ exports.getWifiHotSpot = function(req, res){
 	if(typeof req.params.id !== 'undefined' && req.params.id){
 		id = req.params.id
 	}
-	console.log('id: ' + id);
+	console.log('Finding WifiHotSpot: ' + id);
 	WifiHotSpotModel.findOne({'_id' : id},'name loc', function (err, wifiHotspot) {
- 		if (!err) {
-      		return res.send(wifiHotspot);
-	    } else {
-	    	return console.log(err);
+ 		
+ 		res.setHeader('Content-Type', 'application/json');
+ 		if (err) {
+			console.log(err);
+			res.send(500);
+	    } 
+	    if(!wifiHotspot){
+	    	res.send(404);
 	    }
+	    return res.send(wifiHotspot);
 	});
 };

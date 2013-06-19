@@ -21,7 +21,8 @@ app.listen(port, function() {
 
 /******Routes*******/
 app.get('/api/nearby', function(req, res) {
-	res.send('Hi from Nearby')
+  res.setHeader('Content-Type', 'application/json');
+	res.send(200)
 });
 app.get('/api/nearby/wifihotspots', wifi.getAllWifiHotSpots);
 app.get('/api/nearby/wifihotspots/:id', wifi.getWifiHotSpot);
