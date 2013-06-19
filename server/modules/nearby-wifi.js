@@ -27,7 +27,8 @@ exports.getAllWifiHotSpots = function(req, res){
 	var lng;
 
 	if (typeof req.query.limit !== 'undefined' 
-		&& req.query.limit !== null){
+		&& req.query.limit !== null
+		&& !isNaN(req.query.limit)){
    		l_val = parseInt(req.query.limit)
 	}
 
