@@ -17,10 +17,21 @@ var Schema = mongoose.Schema;
 
 var WifiHotSpot = new Schema({
     name: String,
-    address: String
+    loc: [Number],
+    address: String,
+    city: String,
+    zip: String,
+    phone: String,
+    type: String,
+    url: String
 }, {collection: 'wifihotspots'});
 
 var WifiHotSpotModel = mongoose.model('WifiHotSpots', WifiHotSpot)
+
+//clear the collection
+WifiHotSpotModel.remove({},function(err) { 
+   console.log('wifiHotSpots collection cleared') 
+});
 
 csv()
 .from.path(__dirname+'/../data/wifi/csv/data.csv', 
@@ -32,10 +43,19 @@ csv()
     return data;
 })
 .on('record', function(row,index){
-  //console.log('#'+index+' '+ row.NAME + ',' + row.ADDRESS);
+  
+  var lat = row.SHAPE.split(',')[0];
+  var lng = row.SHAPE.split(',')[1];
+
   new WifiHotSpotModel({
   	name: row.NAME,
-  	address: row.ADDRESS
+  	loc: [lng.slice(0,lng.length-1), lat.slice(1,lat.length)],
+  	address: row.ADDRESS,
+  	city: row.CITY,
+  	zip: row.ZIP,
+  	phone: row.PHONE,
+  	type: row.type,
+  	url: row.URL
   }).save();
 })
 .on('error', function(error){
