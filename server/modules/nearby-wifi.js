@@ -15,7 +15,14 @@ conn.once('open', function callback () {
 var Schema = mongoose.Schema;
 
 var WifiHotSpot = new Schema({
-    name: String
+    name: String,
+    loc: [Number],
+    address: String,
+    city: String,
+    zip: String,
+    phone: String,
+    type: String,
+    url: String
 }, {collection: 'wifihotspots'});
 
 var WifiHotSpotModel = mongoose.model('WifiHotSpot', WifiHotSpot)
@@ -48,7 +55,8 @@ exports.getAllWifiHotSpots = function(req, res){
 		lat = parseFloat(req.query.lat)
 	}
 	console.log('Finding WifiHotpSpots');
-	var query = WifiHotSpotModel.find({}).select('name loc');
+	var query = WifiHotSpotModel.find({})
+					.select('name address city zip phone url loc');
 
 	//add the geospatial query criteria if lat and lng are available
 	if(typeof lng !== 'undefined' && typeof lat !== 'undefined'){
