@@ -1,5 +1,5 @@
 var  express = require('express')
-	   wifi = require('./server/modules/nearby-wifi.js');
+	   wifi = require('./server/modules/nearby-wifi');
 
 var app = express();
 
