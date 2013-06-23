@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
 	Fs = require('fs'),
 	csv = require('csv');
 
-var mongoUri =  'mongodb://localhost/nearby-test?poolSize=1';
+var mongoUri =  'mongodb://localhost/nearby?poolSize=1';
 
 mongoose.connect(mongoUri);
 
