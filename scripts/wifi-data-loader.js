@@ -54,7 +54,7 @@ csv()
   	city: row.CITY,
   	zip: row.ZIP,
   	phone: row.PHONE,
-  	type: row.type,
+  	type: row.TYPE,
   	url: row.URL
   }).save();
 })

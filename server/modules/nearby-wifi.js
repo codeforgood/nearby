@@ -56,7 +56,7 @@ exports.getAllWifiHotSpots = function(req, res){
 	}
 	console.log('Finding WifiHotpSpots');
 	var query = WifiHotSpotModel.find({})
-					.select('name address city zip phone url loc');
+					.select('name address city zip phone url type loc');
 
 	//add the geospatial query criteria if lat and lng are available
 	if(typeof lng !== 'undefined' && typeof lat !== 'undefined'){
