@@ -16,7 +16,7 @@ var Schema = mongoose.Schema;
 
 var WifiHotSpot = new Schema({
     name: String,
-    loc: [Number],
+    loc: {type: [Number], index: '2d'},
     address: String,
     city: String,
     zip: String,
