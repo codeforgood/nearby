@@ -90,21 +90,27 @@ exports.getAllSpots = function(req, res){
 exports.getSpot = function(req, res){
 
 	var id;
+	
 	if(typeof req.params.id !== 'undefined' && req.params.id){
 		id = req.params.id
 	}
 
-	console.log('Finding Spot: ' + id);
-	SpotModel.findOne({'_id' : id},'name loc', function (err, spot) {
- 		
- 		res.setHeader('Content-Type', 'application/json');
- 		if (err) {
-			console.log(err);
-			res.send(500);
-	    } 
-	    if(!spot){
-	    	res.send(404);
-	    }
-	    return res.send(spot);
-	});
+	if (! id.match(/^[0-9a-fA-F]{24}$/)) {
+		console.log('Invalid ObjectId: ' + id);
+		res.send(400);
+	}else{
+		console.log('Finding Spot: ' + id);
+		SpotModel.findOne({'_id' : id},'name loc', function (err, spot) {
+	 		
+	 		res.setHeader('Content-Type', 'application/json');
+	 		if (err) {
+				console.log(err);
+				res.send(500);
+		    } 
+		    if(!spot){
+		    	res.send(404);
+		    }
+		    return res.send(spot);
+		});
+	}
 };
