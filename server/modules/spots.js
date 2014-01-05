@@ -14,7 +14,7 @@ conn.once('open', function callback () {
 
 var Schema = mongoose.Schema;
 
-var WifiHotSpot = new Schema({
+var Spot = new Schema({
     name: String,
     loc: {type: [Number], index: '2d'},
     address: String,
@@ -22,17 +22,21 @@ var WifiHotSpot = new Schema({
     zip: String,
     phone: String,
     type: String,
-    url: String
-}, {collection: 'wifihotspots'});
+    url: String,
+    open: Boolean
+}, {collection: 'spots'});
 
-var WifiHotSpotModel = mongoose.model('WifiHotSpot', WifiHotSpot)
+var SpotModel = mongoose.model('Spot', Spot)
 
-exports.getAllWifiHotSpots = function(req, res){
+exports.getAllSpots = function(req, res){
 
-	var l_val = 10;
-	var lat;
-	var lng;
+	var l_val = 10, stype, lat, lng;
 
+	if (typeof req.query.stype !== 'undefined' 
+		&& req.query.stype !== null){
+   		stype = req.query.stype
+	}
+	
 	if (typeof req.query.limit !== 'undefined' 
 		&& req.query.limit !== null
 		&& !isNaN(req.query.limit)){
@@ -54,9 +58,14 @@ exports.getAllWifiHotSpots = function(req, res){
 		&& req.query.lat < 180){
 		lat = parseFloat(req.query.lat)
 	}
-	console.log('Finding WifiHotpSpots');
-	var query = WifiHotSpotModel.find({})
+	console.log('Finding Best Matching Spots');
+	var query = SpotModel.find({})
 					.select('name address city zip phone url type loc');
+
+	if(typeof stype !== 'undefined'){
+		console.log('Type: ' + stype);
+		query.where('spottype').equals(stype)
+	}
 
 	//add the geospatial query criteria if lat and lng are available
 	if(typeof lng !== 'undefined' && typeof lat !== 'undefined'){
@@ -67,34 +76,35 @@ exports.getAllWifiHotSpots = function(req, res){
 	console.log('limit: ' + l_val);
 	query.limit(l_val);
 	
-	query.exec(function (err, wifiHotspots) {
+	query.exec(function (err, spots) {
 
  		res.setHeader('Content-Type', 'application/json');
  		if (err) {
 			console.log(err);
 			res.send(500);
 	    } 
-	    return res.send(wifiHotspots);
+	    return res.send(spots);
 	});
 };
 
-exports.getWifiHotSpot = function(req, res){
+exports.getSpot = function(req, res){
 
 	var id;
 	if(typeof req.params.id !== 'undefined' && req.params.id){
 		id = req.params.id
 	}
-	console.log('Finding WifiHotSpot: ' + id);
-	WifiHotSpotModel.findOne({'_id' : id},'name loc', function (err, wifiHotspot) {
+
+	console.log('Finding Spot: ' + id);
+	SpotModel.findOne({'_id' : id},'name loc', function (err, spot) {
  		
  		res.setHeader('Content-Type', 'application/json');
  		if (err) {
 			console.log(err);
 			res.send(500);
 	    } 
-	    if(!wifiHotspot){
+	    if(!spot){
 	    	res.send(404);
 	    }
-	    return res.send(wifiHotspot);
+	    return res.send(spot);
 	});
 };

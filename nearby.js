@@ -1,5 +1,5 @@
 var  express = require('express')
-	   wifi = require('./server/modules/nearby-wifi');
+	   wifi = require('./server/modules/spots');
 
 var app = express();
 
@@ -24,6 +24,6 @@ app.get('/api/nearby', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
 	res.send(200)
 });
-app.get('/api/nearby/wifihotspots', wifi.getAllWifiHotSpots);
-app.get('/api/nearby/wifihotspots/:id', wifi.getWifiHotSpot);
+app.get('/api/nearby/spots', wifi.getAllSpots);
+app.get('/api/nearby/spot/:id', wifi.getSpot);
 /******Routes*******/

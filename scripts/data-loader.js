@@ -15,7 +15,7 @@ conn.once('open', function callback () {
 
 var Schema = mongoose.Schema;
 
-var WifiHotSpot = new Schema({
+var Spot = new Schema({
     name: String,
     loc: [Number],
     address: String,
@@ -23,19 +23,23 @@ var WifiHotSpot = new Schema({
     zip: String,
     phone: String,
     type: String,
-    url: String
-}, {collection: 'wifihotspots'});
+    url: String,
+    open: Boolean,
+    spottype: String,
+}, {collection: 'spots'});
 
-var WifiHotSpotModel = mongoose.model('WifiHotSpots', WifiHotSpot)
+var SpotModel = mongoose.model('Spot', Spot)
 
 //clear the collection
-WifiHotSpotModel.remove({},function(err) { 
-   console.log('wifiHotSpots collection cleared') 
+SpotModel.remove({},function(err) { 
+   console.log('Spots collection cleared') 
 });
 
+// load wifi hot spots
 csv()
 .from.path(__dirname+'/../data/wifi/csv/data.csv', 
-	{ 	delimiter: ',', 
+	{ 
+    delimiter: ',', 
 		escape: '"',
 		columns: true
 	})
@@ -47,7 +51,7 @@ csv()
   var lat = row.SHAPE.split(',')[0];
   var lng = row.SHAPE.split(',')[1];
 
-  new WifiHotSpotModel({
+  new SpotModel({
   	name: row.NAME,
   	loc: [lng.slice(0,lng.length-1), lat.slice(1,lat.length)],
   	address: row.ADDRESS,
@@ -55,7 +59,8 @@ csv()
   	zip: row.ZIP,
   	phone: row.PHONE,
   	type: row.TYPE,
-  	url: row.URL
+  	url: row.URL,
+    spottype: 'wifi'
   }).save();
 })
 .on('error', function(error){
@@ -63,6 +68,38 @@ csv()
   mongoose.connection.close()
 })
 .on('end', function(count){
-  console.log('Number of lines: '+count);
+  console.log('Number of wifi hot spots loaded: '+ count);
+  //mongoose.connection.close()
+});
+
+// load restroom spots
+csv()
+.from.path(__dirname+'/../data/restroom/csv/data.csv', 
+  { 
+    delimiter: ',', 
+    escape: '"',
+    columns: true
+  })
+.transform(function(data){
+    return data;
+})
+.on('record', function(row,index){
+
+  new SpotModel({
+    name: row.NAME,
+    //loc: [lng.slice(0,lng.length-1), lat.slice(1,lat.length)],
+    address: row.Location,
+    city: row.Borough,
+    //zip: row.ZIP,
+    //phone: row.PHONE,
+    spottype: 'restroom'
+  }).save();
+})
+.on('error', function(error){
+  console.log(error.message);
+  mongoose.connection.close()
+})
+.on('end', function(count){
+  console.log('Number of restroom spots loaded: '+ count);
   mongoose.connection.close()
 });
